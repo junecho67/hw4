@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe - Part 4</title>
+    <style>
+        html{
+            height: 100%
+        }    
+        
+        body{
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 5px;
+        }
+
+        .square {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #000000;
+            font-size: 72px;
+            text-align: center;
+            line-height: 100px;
+            cursor: pointer;
+        }
+
+        .square:hover {
+            background-color: #ebebeb;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px;
+            padding: 10px;
+            border: 2px solid #000000;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>❌ Welcome to Tic Tac Toe Part 4 🅾️</h1>
+
+    <div class="message" id="turnMessage">Turn: X</div>
+
+    <div class="board" id="board"></div>
+
+    <div class="message" id="statusMessage">Game on!</div>
+
+    <button id="startGame">Start Game</button>
+
+    <script>
+        const NUM_SQUARES = 9;
+        let currentPlayer = Math.random() < 0.5 ? 'X' : 'O';  // Randomly choose who starts
+        let gameActive = true;
+
+        const winConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+            [0, 4, 8], [2, 4, 6]  // Diagonals
+        ];
+
+        document.getElementById('turnMessage').innerText = `Turn: ${currentPlayer}`;
+
+        function initializeBoard() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';  // Clear board
+
+            for (let i = 0; i < NUM_SQUARES; i++) {
+                const square = document.createElement('div');
+                square.className = 'square';
+                square.id = 'sq' + i;
+                square.addEventListener('click', handleClick);
+                board.appendChild(square);
+            }
+
+            document.getElementById('statusMessage').innerText = 'Game on!';
+            gameActive = true;
+        }
+
+        function handleClick(e) {
+            const square = e.target;
+
+            if (square.innerText !== '' || !gameActive) return;
+
+            square.innerText = currentPlayer;
+
+            // Popup to show the square number
+            alert('Square clicked: ' + square.id.replace('sq', ''));
+
+            const moves = getMoves();
+
+            const winConditionStrings = getWinConditionsAsStrings(moves);
+
+            // Check win or stalemate
+            if (winConditionStrings.includes(`${currentPlayer}${currentPlayer}${currentPlayer}`)) {
+                document.getElementById('statusMessage').innerText = `${currentPlayer} wins!`;
+                gameActive = false;  
+            } else if (moves.indexOf('-') === -1) {
+                document.getElementById('statusMessage').innerText = `It's a stalemate!`;
+                gameActive = false;  
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                document.getElementById('turnMessage').innerText = `Turn: ${currentPlayer}`;
+            }
+        }
+
+        function getMoves() {
+            const moves = [];
+            document.querySelectorAll('.square').forEach(square => {
+                moves.push(square.innerText === '' ? '-' : square.innerText);
+            });
+            return moves;
+        }
+
+        function getWinConditionsAsStrings(moves) {
+            return winConditions.map(condition =>
+                condition.map(index => moves[index]).join('')
+            );
+        }
+
+        // "Start Game" button to reset game
+        document.getElementById('startGame').addEventListener('click', () => {
+            currentPlayer = Math.random() < 0.5 ? 'X' : 'O'; 
+            document.getElementById('turnMessage').innerText = `Turn: ${currentPlayer}`;
+            initializeBoard();
+        });
+
+        initializeBoard();
+    </script>
+
+</body>
+</html>
